@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Version>0.0.1</Version>
+    <PackageId>MailerSendNetCore</PackageId>
+    <Authors>Ricardo Yánez</Authors>
+    <Product>MailerSendNetCoreNetCore</Product>
+    <Description>A simple client for MailerSend</Description>
+    <PackageTags>MailerSend</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReleaseNotes>This project is an unofficial client for MailerSend and does not claim to be complete, I just added the use cases that I needed for my uses.</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/yanezricardo/MailerSendNetCore.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/yanezricardo/MailerSendNetCore</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\Extensions\" />
+  </ItemGroup>
+
+</Project>
