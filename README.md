@@ -9,7 +9,7 @@ This project is an unofficial client for MailerSend and does not claim to be com
 
 ## How To Use
 
-* Clone the project and add a referece in for project or Install de nuget package.
+* Clone the project and add a referece in for project or Install the [nuget package](https://www.nuget.org/packages/MailerSendNetCore/0.0.1).
 * Configure the client in Startup file
 
 ```
