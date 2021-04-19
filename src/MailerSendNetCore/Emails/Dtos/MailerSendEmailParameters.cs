@@ -96,6 +96,9 @@ namespace MailerSendNetCore.Emails.Dtos
 
         public MailerSendEmailParameters WithTo(params MailerSendEmailRecipient[] to)
         {
+            if (to == null)
+                return this;
+
             To = new List<MailerSendEmailRecipient>(to);
             return this;
         }
@@ -111,6 +114,9 @@ namespace MailerSendNetCore.Emails.Dtos
 
         public MailerSendEmailParameters WithVariable(params MailerSendEmailVariable[] variable)
         {
+            if (variable == null)
+                return this;
+
             Variables = new List<MailerSendEmailVariable>();
             foreach (var item in variable)
             {
@@ -130,6 +136,9 @@ namespace MailerSendNetCore.Emails.Dtos
 
         public MailerSendEmailParameters WithAttachment(params MailerSendEmailAttachment[] attachments)
         {
+            if (attachments == null)
+                return this;
+
             Attachments = new List<MailerSendEmailAttachment>(attachments);
             return this;
         }
@@ -151,6 +160,9 @@ namespace MailerSendNetCore.Emails.Dtos
 
         public MailerSendEmailParameters WithPersonalization(params MailerSendEmailPersonalization[] personalizations)
         {
+            if (personalizations == null)
+                return this;
+
             Personalizations = new List<MailerSendEmailPersonalization>();
             foreach (var item in personalizations)
             {
