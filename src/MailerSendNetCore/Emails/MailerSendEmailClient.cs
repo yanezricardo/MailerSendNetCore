@@ -1,91 +1,31 @@
-﻿using MailerSendNetCore.Common.Exceptions;
+﻿using MailerSendNetCore.Common;
+using MailerSendNetCore.Common.Exceptions;
+using MailerSendNetCore.Common.Extensions;
 using MailerSendNetCore.Common.Interfaces;
 using MailerSendNetCore.Emails.Dtos;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MailerSendNetCore.Emails
 {
     public class MailerSendEmailClient : IMailerSendEmailClient
     {
-        protected struct ObjectResponseResult<T>
-        {
-            public ObjectResponseResult(T responseObject, string responseText)
-            {
-                this.Object = responseObject;
-                this.Text = responseText;
-            }
-            public T Object { get; }
-            public string Text { get; }
-        }
-
         private readonly HttpClient _httpClient;
-        private readonly string _apiToken;
-        private Lazy<JsonSerializerSettings> _settings;
+        private readonly MailerSendEmailClientOptions _options;
+        private readonly JsonSerializerSettings _serializerSettings = default!;
 
-        public MailerSendEmailClient(HttpClient httpClient, string apiToken)
+        public MailerSendEmailClient(HttpClient httpClient, IOptions<MailerSendEmailClientOptions> options)
         {
-            if (string.IsNullOrWhiteSpace(apiToken))
-                throw new ArgumentNullException(nameof(apiToken));
-
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _apiToken = apiToken;
-            _settings = new Lazy<JsonSerializerSettings>(CreateSerializerSettings);
-        }
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
 
-        private JsonSerializerSettings CreateSerializerSettings()
-        {
-            var settings = new JsonSerializerSettings()
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-            };
-            return settings;
-        }
+            if (string.IsNullOrWhiteSpace(_options.ApiToken))
+                throw new ArgumentException("Missing apiToken");
 
-        private async Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(HttpResponseMessage response, IReadOnlyDictionary<string, IEnumerable<string>> headers, bool readResponseAsString = false, CancellationToken cancellationToken = default)
-        {
-            if (response == null || response.Content == null)
-            {
-                return new ObjectResponseResult<T>(default, string.Empty);
-            }
+            _httpClient.BaseAddress = new Uri(_options.ApiUrl ?? "https://api.mailersend.com");
 
-            if (readResponseAsString)
-            {
-                var responseText = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                try
-                {
-                    var typedBody = JsonConvert.DeserializeObject<T>(responseText, _settings.Value);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
-                }
-                catch (JsonException exception)
-                {
-                    var message = "Could not deserialize the response body string as " + typeof(T).FullName + ".";
-                    throw new ApiException(message, (int)response.StatusCode, responseText, headers, exception);
-                }
-            }
-            else
-            {
-                try
-                {
-                    using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-                    using var streamReader = new System.IO.StreamReader(responseStream);
-                    using var jsonTextReader = new JsonTextReader(streamReader);
-                    var serializer = JsonSerializer.Create(_settings.Value);
-                    var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                    return new ObjectResponseResult<T>(typedBody, string.Empty);
-                }
-                catch (JsonException exception)
-                {
-                    var message = "Could not deserialize the response body stream as " + typeof(T).FullName + ".";
-                    throw new ApiException(message, (int)response.StatusCode, string.Empty, headers, exception);
-                }
-            }
+            _serializerSettings = new JsonSerializerSettings();
         }
 
         public Task<MailerSendEmailResponse> SendEmailAsync(MailerSendEmailParameters parameters)
@@ -93,57 +33,117 @@ namespace MailerSendNetCore.Emails
             return SendEmailAsync(parameters, CancellationToken.None);
         }
 
-        public async Task<MailerSendEmailResponse> SendEmailAsync(MailerSendEmailParameters parameters, CancellationToken cancellationToken)
+        public async Task<MailerSendEmailResponse> SendEmailAsync(MailerSendEmailParameters parameters, CancellationToken cancellationToken = default)
         {
-            if (parameters == null)
-                throw new ArgumentNullException(nameof(parameters));
+            using var response = await PostAsync("v1/email", parameters, cancellationToken);
 
-            var resource = "v1/email";
-            var json = JsonConvert.SerializeObject(parameters, _settings.Value);
-            var content = new StringContent(json);
+            var headers = response.HeadersToDictionary();
+            var xMesageId = response.GetHeaderValueOrDefault("X-Message-Id");
+
+            var status = (int)response.StatusCode;
+            if (status == 202)
+            {
+                return new MailerSendEmailResponse { MessageId = xMesageId };
+            }
+
+            if (status == 422)
+            {
+                var objectResponse = await response.ReadObjectResponseAsync<MailerSendEmailResponse>(headers, _serializerSettings!, cancellationToken: cancellationToken);
+                if (objectResponse.Object == null)
+                {
+                    throw new ApiException("Unexpected response.", status, objectResponse.Text, headers, null);
+                }
+                objectResponse.Object.MessageId = xMesageId;
+                return objectResponse.Object;
+            }
+
+            var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new ApiException("Unexpected response HTTP status code (" + status + ").", status, responseData, headers, null);
+        }
+
+
+        public Task<MailerSendBulkEmailResponse> SendBulkEmailAsync(MailerSendEmailParameters[] parameters)
+        {
+            return SendBulkEmailAsync(parameters, CancellationToken.None);
+        }
+
+        public async Task<MailerSendBulkEmailResponse> SendBulkEmailAsync(MailerSendEmailParameters[] parameters, CancellationToken cancellationToken)
+        {
+            using var response = await PostAsync("v1/bulk-email", parameters, cancellationToken);
+
+            var headers = response.HeadersToDictionary();
+
+            var status = (int)response.StatusCode;
+            if (status == 202)
+            {
+                var objectResponse = await response.ReadObjectResponseAsync<MailerSendBulkEmailResponse>(headers, _serializerSettings!, cancellationToken: cancellationToken);
+                if (objectResponse.Object == null)
+                {
+                    throw new ApiException("Unexpected response.", status, objectResponse.Text, headers, null);
+                }
+                return objectResponse.Object;
+            }
+
+            var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new ApiException("Unexpected response HTTP status code (" + status + ").", status, responseData, headers, null);
+        }
+
+
+        public Task<MailerSendBulkEmailStatusResponse> GetBulkEmailStatusAsync(string bulkEmailId)
+        {
+            return GetBulkEmailStatusAsync(bulkEmailId, CancellationToken.None);
+        }
+
+        public async Task<MailerSendBulkEmailStatusResponse> GetBulkEmailStatusAsync(string bulkEmailId, CancellationToken cancellationToken)
+        {
+            using var response = await GetAsync($"v1/bulk-email/{bulkEmailId}", cancellationToken);
+
+            var headers = response.HeadersToDictionary();
+
+            var status = (int)response.StatusCode;
+            if (status == 200)
+            {
+                var objectResponse = await response.ReadObjectResponseAsync<MailerSendBulkEmailStatusResponse>(headers, _serializerSettings!, cancellationToken: cancellationToken);
+                if (objectResponse.Object == null)
+                {
+                    throw new ApiException("Unexpected response.", status, objectResponse.Text, headers, null);
+                }
+                return objectResponse.Object;
+            }
+
+            if (status == 404)
+            {
+                throw new ApiException($"Not Found ({bulkEmailId})", status, string.Empty, headers, null);
+            }
+
+            var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new ApiException("Unexpected response HTTP status code (" + status + ").", status, responseData, headers, null);
+        }
+
+
+        private async Task<HttpResponseMessage> PostAsync<TData>(string resource, TData data, CancellationToken cancellationToken = default)
+        {
+            if (data is null)
+                throw new ArgumentNullException(nameof(data));
+
+            var content = new StringContent(JsonConvert.SerializeObject(data, _serializerSettings));
             content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
             using var request = new HttpRequestMessage(new HttpMethod("POST"), new Uri(resource, UriKind.RelativeOrAbsolute));
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiToken);
             request.Content = content;
 
-            var client = _httpClient;
-            var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            try
-            {
-                var headers = Enumerable.ToDictionary(response.Headers, h_ => h_.Key, h_ => h_.Value, StringComparer.OrdinalIgnoreCase);
-                if (response.Content != null && response.Content.Headers != null)
-                {
-                    foreach (var item in response.Content.Headers)
-                        headers[item.Key] = item.Value;
-                }
+            return await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        }
 
-                var xMesageId = headers.ContainsKey("X-Message-Id") ? headers["X-Message-Id"].FirstOrDefault() : "";
-                var status = (int)response.StatusCode;
-                if (status == 202)
-                {
-                    return new MailerSendEmailResponse { MessageId = xMesageId };
-                }
+        private async Task<HttpResponseMessage> GetAsync(string resource, CancellationToken cancellationToken = default)
+        {
+            using var request = new HttpRequestMessage(new HttpMethod("GET"), new Uri(resource, UriKind.RelativeOrAbsolute));
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiToken);
 
-                if (status == 422)
-                {
-                    var objectResponse = await ReadObjectResponseAsync<MailerSendEmailResponse>(response, headers, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    if (objectResponse.Object == null)
-                    {
-                        throw new ApiException("Unexpected response.", status, objectResponse.Text, headers, null);
-                    }
-                    objectResponse.Object.MessageId = xMesageId;
-                    return objectResponse.Object;
-                }
-
-                var responseData = response.Content == null ? null : await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                throw new ApiException("Unexpected response HTTP status code (" + status + ").", status, responseData, headers, null);
-            }
-            finally
-            {
-                response.Dispose();
-            }
+            return await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
         }
     }
 }

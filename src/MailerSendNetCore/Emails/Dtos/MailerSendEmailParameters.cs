@@ -10,7 +10,7 @@ namespace MailerSendNetCore.Emails.Dtos
     public class MailerSendEmailParameters
     {
         [JsonProperty("from")]
-        public MailerSendEmailRecipient From { get; set; }
+        public MailerSendEmailRecipient? From { get; set; }
 
         [JsonProperty("to")]
         public ICollection<MailerSendEmailRecipient> To { get; set; }
@@ -19,16 +19,16 @@ namespace MailerSendNetCore.Emails.Dtos
         public ICollection<MailerSendEmailRecipient> ReplyTo { get; set; }
 
         [JsonProperty("subject")]
-        public string Subject { get; set; }
+        public string? Subject { get; set; }
 
         [JsonProperty("text")]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [JsonProperty("html")]
-        public string Html { get; set; }
+        public string? Html { get; set; }
 
         [JsonProperty("template_id")]
-        public string TemplateId { get; set; }
+        public string? TemplateId { get; set; }
 
         [JsonProperty("variables")]
         public ICollection<MailerSendEmailVariable> Variables { get; set; }
