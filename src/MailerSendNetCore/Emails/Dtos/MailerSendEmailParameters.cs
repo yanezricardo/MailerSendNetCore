@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -15,31 +12,31 @@ namespace MailerSendNetCore.Emails.Dtos
         [JsonProperty("to")]
         public ICollection<MailerSendEmailRecipient> To { get; set; }
 
-        [JsonProperty("reply_to")]
+        [JsonProperty("reply_to", NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<MailerSendEmailRecipient> ReplyTo { get; set; }
 
         [JsonProperty("subject")]
         public string? Subject { get; set; }
 
-        [JsonProperty("text")]
+        [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
         public string? Text { get; set; }
 
-        [JsonProperty("html")]
+        [JsonProperty("html", NullValueHandling = NullValueHandling.Ignore)]
         public string? Html { get; set; }
 
-        [JsonProperty("template_id")]
+        [JsonProperty("template_id", NullValueHandling = NullValueHandling.Ignore)]
         public string? TemplateId { get; set; }
 
-        [JsonProperty("variables")]
+        [JsonProperty("variables", NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<MailerSendEmailVariable> Variables { get; set; }
 
-        [JsonProperty("attachments")]
+        [JsonProperty("attachments", NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<MailerSendEmailAttachment> Attachments { get; set; }
 
-        [JsonProperty("personalization")]
+        [JsonProperty("personalization", NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<MailerSendEmailPersonalization> Personalizations { get; set; }
 
-        [JsonProperty("tags")]
+        [JsonProperty("tags", NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<string> Tags { get; set; }
 
         public MailerSendEmailParameters()
