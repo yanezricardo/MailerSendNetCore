@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MailserSend.UintTests.Common.Extensions
+namespace MailserSend.UnitTests.Common.Extensions
 {
     public class ServiceCollectionExtensionsTests
     {

@@ -4,7 +4,7 @@ using MailerSendNetCore.Common.Exceptions;
 using MailerSendNetCore.Common.Interfaces;
 using MailerSendNetCore.Emails;
 using MailerSendNetCore.Emails.Dtos;
-using MailerSendNetCore.UintTests.Mocks;
+using MailerSendNetCore.UnitTests.Mocks;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MailerSendNetCore.UintTests.Emails
+namespace MailerSendNetCore.UnitTests.Emails
 {
     public class MailerSendEmailClientTests
     {
