@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace MailerSendNetCore.UintTests.Emails
+namespace MailerSendNetCore.UnitTests.Emails
 {
     public class MailerSendEmailParametersTests
     {
@@ -196,6 +196,33 @@ namespace MailerSendNetCore.UintTests.Emails
             instance.To.Should().HaveCount(2);
 
             var item = instance.To.Last();
+            item.Email.Should().Be("test2@tests.com");
+            item.Name.Should().Be("");
+        }
+
+        [Fact]
+        public void Test_WithBcc1_ShouldRecplaceBccCollection()
+        {
+            var instance = new MailerSendEmailParameters();
+            instance.WithBcc(new MailerSendEmailRecipient("test@tests.com", "Test"));
+            instance.Bcc.Should().NotBeEmpty();
+            instance.Bcc.Should().HaveCount(1);
+
+            var item = instance.Bcc.First();
+            item.Email.Should().Be("test@tests.com");
+            item.Name.Should().Be("Test");
+        }
+
+        [Fact]
+        public void Test_WithBcc2_ShouldAddNewRecipient()
+        {
+            var instance = new MailerSendEmailParameters();
+            instance.WithBcc(new MailerSendEmailRecipient("test@tests.com", "Test"));
+            instance.WithBcc("test2@tests.com");
+            instance.Bcc.Should().NotBeEmpty();
+            instance.Bcc.Should().HaveCount(2);
+
+            var item = instance.Bcc.Last();
             item.Email.Should().Be("test2@tests.com");
             item.Name.Should().Be("");
         }

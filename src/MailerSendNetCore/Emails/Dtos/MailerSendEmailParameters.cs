@@ -12,6 +12,9 @@ namespace MailerSendNetCore.Emails.Dtos
         [JsonProperty("to")]
         public ICollection<MailerSendEmailRecipient> To { get; set; }
 
+        [JsonProperty("bcc")]
+        public ICollection<MailerSendEmailRecipient> Bcc { get; set; }
+
         [JsonProperty("reply_to", NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<MailerSendEmailRecipient> ReplyTo { get; set; }
 
@@ -97,6 +100,27 @@ namespace MailerSendNetCore.Emails.Dtos
                 return this;
 
             To = new List<MailerSendEmailRecipient>(to);
+            return this;
+        }
+
+        public MailerSendEmailParameters WithBcc(params string[] bcc)
+        {
+            if (bcc == null || bcc.Length == 0)
+                return this;
+
+            foreach (var email in bcc)
+            {
+                Bcc.Add(new MailerSendEmailRecipient(email, ""));
+            }
+            return this;
+        }
+
+        public MailerSendEmailParameters WithBcc(params MailerSendEmailRecipient[] bcc)
+        {
+            if (bcc == null)
+                return this;
+
+            Bcc = new List<MailerSendEmailRecipient>(bcc);
             return this;
         }
 
