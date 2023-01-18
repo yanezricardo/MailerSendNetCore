@@ -45,6 +45,7 @@ namespace MailerSendNetCore.Emails.Dtos
         public MailerSendEmailParameters()
         {
             To = new List<MailerSendEmailRecipient>();
+            Bcc = new List<MailerSendEmailRecipient>();
             ReplyTo = new List<MailerSendEmailRecipient>();
             Variables = new List<MailerSendEmailVariable>();
             Attachments = new List<MailerSendEmailAttachment>();
