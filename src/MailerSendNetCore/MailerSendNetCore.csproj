@@ -10,6 +10,7 @@
 		<Product>MailerSendNetCoreNetCore</Product>
 		<Description>A simple client for MailerSend</Description>
 		<PackageTags>MailerSend</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReleaseNotes>This project is an unofficial client for MailerSend and does not claim to be complete, I just added the use cases that I needed for my uses.</PackageReleaseNotes>
@@ -17,6 +18,14 @@
 		<PackageProjectUrl>https://github.com/yanezricardo/MailerSendNetCore</PackageProjectUrl>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+ 
+	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />

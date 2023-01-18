@@ -1,48 +1,93 @@
-# Important
+## MailerSend SDK for .NET
 
-This project is an unofficial client for MailerSend and does not claim to be complete, I just added the use cases that I needed for my uses.
+This project provides an easy way to interact with the MailerSend API using C# and the .NET Framework. It is built on .NET 7 and uses Newtonsoft.Json for JSON serialization and deserialization.
 
-## Dependencies
+**This is an unofficial SDK for MailerSend and does not claim to be complete.**
 
-* .NET 7 SDK
-* Newtonsoft.Json
+## Getting Started
 
-## How To Use
+To start using this SDK, you will need to install it via NuGet or cloning and adding a reference in your project.
 
-* Clone the project and add a referece in for project or Install the [nuget package](https://www.nuget.org/packages/MailerSendNetCore/0.0.4).
-* Configure the client using one of the following methods>
-
+### Installation
+```powershell
+Install-Package MailerSendNetCore
 ```
-            //Default options without ApiToken
-            services.AddMailerSendEmailClient();
 
-            //Read options from configuration
-            services.AddMailerSendEmailClient(configuration.GetSection("MailerSend"));
+### Usage
 
-            //Set options from configuration manually
-            services.AddMailerSendEmailClient(options =>
-            {
-                options.ApiUrl = configuration["MailerSend:ApiUrl"];
-                options.ApiToken = configuration["MailerSend:ApiToken"];
-            });
+#### Add "MailerSend" section to appsettings.json
+```json
+  "MailerSend": {
+    "ApiUrl": "https://api.mailersend.com/v1",
+    "ApiToken": "<your MailerSend api token>",
+    "UseRetryPolicy": true,
+    "RetryCount": 5
+  },
+ ```
 
-            //Add custom options
-            services.AddMailerSendEmailClient(new MailerSendEmailClientOptions
-            {
-                ApiUrl = configuration["MailerSend:ApiUrl"],
-                ApiToken = configuration["MailerSend:ApiToken"]
-            });
+#### Configure the client using one of the following methods:
+
+```C#
+//METHOD #1: Read options from configuration (RECOMMENDED)
+builder.Services.AddMailerSendEmailClient(builder.Configuration.GetSection("MailerSend"));
+
+//METHOD #2: Set options from configuration manually
+builder.Services.AddMailerSendEmailClient(options =>
+{
+    options.ApiUrl = builder.Configuration["MailerSend:ApiUrl"];
+    options.ApiToken = builder.Configuration["MailerSend:ApiToken"];
+});
+
+//METHOD #3: Add custom options instance
+builder.Services.AddMailerSendEmailClient(new MailerSendEmailClientOptions
+{
+    ApiUrl = builder.Configuration["MailerSend:ApiUrl"],
+    ApiToken = builder.Configuration["MailerSend:ApiToken"]
+});
 ```
-* Inject the client and use it
 
-```
-            var parameters = new MailerSendEmailParameters();
-            parameters
-                .WithTemplateId(templateId)
-                .WithFrom(senderEmail, senderName)
-                .WithTo(to)
-                .WithSubject(subject)
-                .WithAttachment(attachments);
+#### Inject the client into your service, controller or handler
+```C#
+private readonly IMailerSendEmailClient _mailerSendEmailClient;
 
-            var response = await _mailerSendEmailClient.SendEmail(parameters, cancellationToken).ConfigureAwait(false);
+public EmailService(IMailerSendEmailClient mailerSendEmailClient)
+{
+    _mailerSendEmailClient = mailerSendEmailClient;
+}
 ```
+
+#### Send emailS
+
+```C#
+public async Task<string> SendEmail(string templateId, string senderName, string senderEmail, string[] to, string subject, MailerSendEmailAttachment[] attachments, IDictionary<string, string>? variables, CancellationToken cancellationToken = default)
+{
+    var parameters = new MailerSendEmailParameters();
+    parameters
+        .WithTemplateId(templateId)
+        .WithFrom(senderEmail, senderName)
+        .WithTo(to)
+        .WithAttachment(attachments)
+        .WithSubject(subject);
+
+    if (variables is { Count: > 0 })
+    {
+        foreach (var recipient in to)
+        {
+            parameters.WithPersonalization(recipient, variables);
+        }
+    }
+
+    var response = await _mailerSendEmailClient.SendEmailAsync(parameters, cancellationToken);
+    if (response is { Errors.Count: > 0 })
+    {
+        //handle errors                
+    }
+
+    return response.MessageId;
+}
+```
+
+## Additional Resources
+* [MailerSend developer site](https://developers.mailersend.com)
+* [Newtonsoft.Json documentation](https://www.newtonsoft.com/json/help/html/introduction.htm)
+* [.NET 7 documentation](https://learn.microsoft.com/en-us/dotnet/)
