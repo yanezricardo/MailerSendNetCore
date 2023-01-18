@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 
-namespace MailerSendNetCore.UintTests.Mocks
+namespace MailerSendNetCore.UnitTests.Mocks
 {
     public class MockHttpClient : HttpClient
     {

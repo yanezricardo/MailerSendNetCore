@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5C123DAE-792
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CC48F09B-CE71-48EA-BFB8-0D5A919C2028}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailserSend.UintTests", "tests\MailserSend.UintTests\MailserSend.UintTests.csproj", "{E541DBC1-3B1C-44D6-97B5-DE6891BCF5CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailserSend.UnitTests", "tests\MailserSend.UnitTests\MailserSend.UnitTests.csproj", "{E541DBC1-3B1C-44D6-97B5-DE6891BCF5CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailerSendNetCore", "src\MailerSendNetCore\MailerSendNetCore.csproj", "{0DAA802C-E13F-4C38-9F04-A7C6536B3D42}"
 EndProject
