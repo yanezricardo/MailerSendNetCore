@@ -4,12 +4,12 @@ This project is an unofficial client for MailerSend and does not claim to be com
 
 ## Dependencies
 
-* .NET 6 SDK
+* .NET 7 SDK
 * Newtonsoft.Json
 
 ## How To Use
 
-* Clone the project and add a referece in for project or Install the [nuget package](https://www.nuget.org/packages/MailerSendNetCore/0.0.1).
+* Clone the project and add a referece in for project or Install the [nuget package](https://www.nuget.org/packages/MailerSendNetCore/0.0.4).
 * Configure the client using one of the following methods>
 
 ```
