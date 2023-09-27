@@ -12,6 +12,9 @@ namespace MailerSendNetCore.Emails.Dtos
         [JsonProperty("to")]
         public ICollection<MailerSendEmailRecipient> To { get; set; }
 
+        [JsonProperty("cc")]
+        public ICollection<MailerSendEmailRecipient> Cc { get; set; }
+
         [JsonProperty("bcc")]
         public ICollection<MailerSendEmailRecipient> Bcc { get; set; }
 
@@ -46,6 +49,7 @@ namespace MailerSendNetCore.Emails.Dtos
         {
             To = new List<MailerSendEmailRecipient>();
             Bcc = new List<MailerSendEmailRecipient>();
+            Cc = new List<MailerSendEmailRecipient>();
             ReplyTo = new List<MailerSendEmailRecipient>();
             Variables = new List<MailerSendEmailVariable>();
             Attachments = new List<MailerSendEmailAttachment>();
@@ -122,6 +126,27 @@ namespace MailerSendNetCore.Emails.Dtos
                 return this;
 
             Bcc = new List<MailerSendEmailRecipient>(bcc);
+            return this;
+        }
+
+        public MailerSendEmailParameters WithCc(params string[] cc)
+        {
+            if (cc == null || cc.Length == 0)
+                return this;
+
+            foreach (var email in cc)
+            {
+                Cc.Add(new MailerSendEmailRecipient(email, ""));
+            }
+            return this;
+        }
+
+        public MailerSendEmailParameters WithCc(params MailerSendEmailRecipient[] cc)
+        {
+            if (cc == null)
+                return this;
+
+            Cc = new List<MailerSendEmailRecipient>(cc);
             return this;
         }
 

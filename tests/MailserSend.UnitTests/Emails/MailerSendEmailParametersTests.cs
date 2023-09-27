@@ -228,6 +228,33 @@ namespace MailerSendNetCore.UnitTests.Emails
         }
 
         [Fact]
+        public void Test_WithCc1_ShouldRecplaceCcCollection()
+        {
+            var instance = new MailerSendEmailParameters();
+            instance.WithCc(new MailerSendEmailRecipient("test@tests.com", "Test"));
+            instance.Cc.Should().NotBeEmpty();
+            instance.Cc.Should().HaveCount(1);
+
+            var item = instance.Cc.First();
+            item.Email.Should().Be("test@tests.com");
+            item.Name.Should().Be("Test");
+        }
+
+        [Fact]
+        public void Test_WithCc2_ShouldAddNewRecipient()
+        {
+            var instance = new MailerSendEmailParameters();
+            instance.WithCc(new MailerSendEmailRecipient("test@tests.com", "Test"));
+            instance.WithCc("test2@tests.com");
+            instance.Cc.Should().NotBeEmpty();
+            instance.Cc.Should().HaveCount(2);
+
+            var item = instance.Cc.Last();
+            item.Email.Should().Be("test2@tests.com");
+            item.Name.Should().Be("");
+        }
+
+        [Fact]
         public void Test_WithFrom1_ShouldReplaceVariableCollection()
         {
             var instance = new MailerSendEmailParameters();
