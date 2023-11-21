@@ -30,7 +30,7 @@ namespace MailerSendNetCore.UnitTests.Emails
                 .WithSubject("Hi!")
                 .WithHtmlBody("this is a test");
 
-            Func<Task> action = async () => { await client.SendEmailAsync(parameters).ConfigureAwait(false); };
+            Func<Task> action = async () => { await client.SendEmailAsync(parameters); };
             action.Should()
                 .ThrowAsync<ApiException>()
                 .WithMessage("Unexpected response HTTP status code (500).\n\nStatus: 500\nResponse: \n");
@@ -49,7 +49,7 @@ namespace MailerSendNetCore.UnitTests.Emails
                 .WithSubject("Hi!")
                 .WithHtmlBody("this is a test");
 
-            Func<Task> action = async () => { await client.SendEmailAsync(parameters).ConfigureAwait(false); };
+            Func<Task> action = async () => { await client.SendEmailAsync(parameters); };
             action.Should()
                 .ThrowAsync<ApiException>()
                 .WithMessage("Unexpected response.\n\nStatus: 422\nResponse: \n");
@@ -79,7 +79,7 @@ namespace MailerSendNetCore.UnitTests.Emails
                 .WithSubject("Hi!")
                 .WithHtmlBody("this is a test");
 
-            var response = await client.SendEmailAsync(parameters).ConfigureAwait(false);
+            var response = await client.SendEmailAsync(parameters);
             response.Should().NotBeNull();
             response.Message.Should().Be("The given data was invalid.");
             response.Errors.Should().NotBeEmpty();
@@ -107,7 +107,7 @@ namespace MailerSendNetCore.UnitTests.Emails
                 .WithSubject("Hi!")
                 .WithHtmlBody("this is a test");
 
-            var response = await client.SendEmailAsync(parameters).ConfigureAwait(false);
+            var response = await client.SendEmailAsync(parameters);
             response.Should().NotBeNull();
             response.MessageId.Should().Be("messageid");
             response.Message.Should().BeNullOrEmpty();
@@ -196,7 +196,7 @@ namespace MailerSendNetCore.UnitTests.Emails
             IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
             var bulkEmailId = "bulk_id";
-            Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId).ConfigureAwait(false); };
+            Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId); };
             action.Should()
                 .ThrowAsync<ApiException>()
                 .WithMessage("Unexpected response HTTP status code (500).\n\nStatus: 500\nResponse: \n");
@@ -229,7 +229,7 @@ namespace MailerSendNetCore.UnitTests.Emails
             IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
             var bulkEmailId = "bulk_id";
-            var response = await client.GetBulkEmailStatusAsync(bulkEmailId).ConfigureAwait(false);
+            var response = await client.GetBulkEmailStatusAsync(bulkEmailId);
             response.Should().NotBeNull();
             response.Data.Id.Should().Be(responseContent.data.id);
             response.Data.State.Should().Be(responseContent.data.state);
@@ -252,8 +252,8 @@ namespace MailerSendNetCore.UnitTests.Emails
             IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
             var bulkEmailId = "bulk_id";
-           
-            Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId).ConfigureAwait(false); };
+
+            Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId); };
             await action.Should()
                 .ThrowAsync<ApiException>()
                 .WithMessage("Not Found (bulk_id)\n\nStatus: 404\nResponse: \n");
@@ -269,7 +269,7 @@ namespace MailerSendNetCore.UnitTests.Emails
             IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
             var bulkEmailId = "bulk_id";
-            Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId).ConfigureAwait(false); };
+            Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId); };
             await action.Should()
                 .ThrowAsync<ApiException>()
                 .WithMessage("Unexpected response HTTP status code (429).\n\nStatus: 429\nResponse: \n");

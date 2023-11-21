@@ -2,17 +2,15 @@
 using MailerSendNetCore.Common;
 using MailerSendNetCore.Common.Extensions;
 using MailerSendNetCore.Common.Interfaces;
-using MailerSendNetCore.Emails.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Polly;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -121,6 +119,42 @@ namespace MailserSend.UnitTests.Common.Extensions
             options.RetryDelayInMilliseconds.Should().Be(50000);
         }
 
+        [Fact]
+        public void AddMailerSend_WhenUseRetryPolicyIsFalse_ThenDoNotConfigureRetryPolicy()
+        {
+            var serviceCollection = new ServiceCollection();
+
+            var options = new MailerSendEmailClientOptions
+            {
+                ApiToken = "apiToken",
+                ApiUrl = "https://api.mailersend.com/",
+                UseRetryPolicy = true,
+                RetryCount = 3
+            };
+            serviceCollection.AddMailerSendEmailClient(options);
+
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            var mailerSendEmailClient = serviceProvider.GetService<IMailerSendEmailClient>();
+
+            var httpClient = mailerSendEmailClient.GetType()
+                .GetField("_httpClient", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .GetValue(mailerSendEmailClient) as HttpClient;
+
+            var handlerField = typeof(HttpMessageInvoker).GetField("_handler", BindingFlags.NonPublic | BindingFlags.Instance);
+            var handlerValue = handlerField?.GetValue(httpClient);
+
+            handlerValue.Should().BeAssignableTo<HttpMessageHandler>();
+
+            var httpMessageHandler = handlerValue as HttpMessageHandler;
+
+            var policyHandler = httpMessageHandler.GetInnerHandler<PolicyHttpMessageHandler>();
+
+            policyHandler.Should().NotBeNull();
+
+            httpClient.Should().NotBeNull();
+            httpClient.BaseAddress.Should().Be("https://api.mailersend.com/");
+        }
 
         [Fact]
         public void AddMailerSendEmailClient_When_UseRetryIsSet_Then_SetRetryPolicy()
