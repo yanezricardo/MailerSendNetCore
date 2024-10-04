@@ -45,6 +45,9 @@ namespace MailerSendNetCore.Emails.Dtos
         [JsonProperty("tags", NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<string> Tags { get; set; }
 
+        [JsonProperty("send_at", NullValueHandling = NullValueHandling.Ignore)]
+        public long SendTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
         public MailerSendEmailParameters()
         {
             To = new List<MailerSendEmailRecipient>();
@@ -218,6 +221,14 @@ namespace MailerSendNetCore.Emails.Dtos
 
                 Personalizations.Add(item);
             }
+            return this;
+        }
+
+        public MailerSendEmailParameters WithSendTime(DateTime sendTime)
+        {
+            if (sendTime > DateTime.Now.AddHours(72))
+                throw new InvalidOperationException("The email send time cannot be more than 72 hours in the future");
+            SendTime = ((DateTimeOffset)sendTime).ToUnixTimeSeconds();
             return this;
         }
 

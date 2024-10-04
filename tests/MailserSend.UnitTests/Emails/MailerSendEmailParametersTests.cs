@@ -29,6 +29,30 @@ namespace MailerSendNetCore.UnitTests.Emails
         }
 
         [Fact]
+        public void Test_WithSendTime_ShouldSetSendTime()
+        {
+            var instance = new MailerSendEmailParameters();
+            DateTime sendDateTime = DateTime.Now;
+            long sendUnixTime = ((DateTimeOffset)sendDateTime).ToUnixTimeSeconds();
+            instance.WithSendTime(sendDateTime);
+            instance.SendTime.Should().Be(sendUnixTime);
+        }
+
+        [Fact]
+        public void Test_WithSendTime_ShouldValidateSendTimeRange()
+        {
+            var instance = new MailerSendEmailParameters();
+
+            DateTime invalidSendDate = DateTime.Now.AddHours(73);
+            instance.WithTo("test@test.com");
+
+            Action action = () => instance.WithSendTime(invalidSendDate);
+            action.Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage("The email send time cannot be more than 72 hours in the future");
+        }
+
+        [Fact]
         public void Test_WithAttachment1_ShouldReplaceAttachmentCollection()
         {
             var instance = new MailerSendEmailParameters();
