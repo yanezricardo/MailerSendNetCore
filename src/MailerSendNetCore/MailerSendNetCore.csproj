@@ -4,7 +4,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Version>0.0.6</Version>
+		<Version>0.0.7</Version>
 		<PackageId>MailerSendNetCore</PackageId>
 		<Authors>Ricardo Yánez</Authors>
 		<Product>MailerSendNetCoreNetCore</Product>

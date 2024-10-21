@@ -275,5 +275,26 @@ namespace MailerSendNetCore.UnitTests.Emails
                 .WithMessage("Unexpected response HTTP status code (429).\n\nStatus: 429\nResponse: \n");
         }
 
+        [Fact]
+        public async Task Test_SendMail_When_SendTimeIsNull_Then_SendEmailWithoutSendTime()
+        {
+            var apiToken = "my token";
+            var handler = new MockHttpMessageHandler(HttpStatusCode.Accepted, responseContent: null);
+
+            IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
+
+            var parameters = new MailerSendEmailParameters();
+            parameters
+                .WithFrom("sender@test.com", "Sender")
+                .WithTo("test@test.com")
+                .WithSubject("Hi!")
+                .WithHtmlBody("this is a test");
+
+            var response = await client.SendEmailAsync(parameters);
+
+            // Assert that the request content does not contain SendTime
+            var requestContent = handler.GetLastRequestContent<MailerSendEmailParameters>();
+            requestContent.SendTime.Should().BeNull();
+        }
     }
 }

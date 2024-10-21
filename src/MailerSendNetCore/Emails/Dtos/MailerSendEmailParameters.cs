@@ -46,7 +46,7 @@ namespace MailerSendNetCore.Emails.Dtos
         public ICollection<string> Tags { get; set; }
 
         [JsonProperty("send_at", NullValueHandling = NullValueHandling.Ignore)]
-        public long SendTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        public long? SendTime { get; set; }
 
         public MailerSendEmailParameters()
         {

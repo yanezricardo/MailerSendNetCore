@@ -39,6 +39,13 @@ namespace MailerSendNetCore.UnitTests.Emails
         }
 
         [Fact]
+        public void Test_SendTime_MustBeNullByDefault()
+        {
+            var instance = new MailerSendEmailParameters();
+            instance.SendTime.Should().BeNull();
+        }
+
+        [Fact]
         public void Test_WithSendTime_ShouldValidateSendTimeRange()
         {
             var instance = new MailerSendEmailParameters();

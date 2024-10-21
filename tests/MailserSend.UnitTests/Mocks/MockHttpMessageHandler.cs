@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -12,6 +13,7 @@ namespace MailerSendNetCore.UnitTests.Mocks
         private readonly HttpContent _responseContent = null;
         private readonly HttpStatusCode _responseCode;
         private readonly IDictionary<string, string[]> _responseHeaders;
+        private string _requestContent;
 
         public MockHttpMessageHandler(HttpStatusCode statusCode = HttpStatusCode.OK, object responseContent = null, IDictionary<string, string[]> responseHeaders = null)
         {
@@ -23,8 +25,13 @@ namespace MailerSendNetCore.UnitTests.Mocks
             }
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (request?.Content is not null)
+            {
+                _requestContent = await request.Content.ReadAsStringAsync(cancellationToken);
+            }
+
             var response = new HttpResponseMessage(_responseCode) { Content = _responseContent };
             if (_responseHeaders != null && _responseHeaders.Count > 0)
             {
@@ -33,7 +40,17 @@ namespace MailerSendNetCore.UnitTests.Mocks
                     response.Headers.TryAddWithoutValidation(item.Key, item.Value);
                 }
             }
-            return Task.FromResult(response);
+            return response;
+        }
+
+        internal T GetLastRequestContent<T>()
+        {
+            if (_requestContent is null)
+            {
+                return default;
+            }
+
+            return JsonConvert.DeserializeObject<T>(_requestContent);
         }
     }
 }
