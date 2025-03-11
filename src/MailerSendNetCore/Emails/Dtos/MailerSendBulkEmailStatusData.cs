@@ -26,7 +26,7 @@ namespace MailerSendNetCore.Emails.Dtos
         public object? ValidationErrors { get; set; }
         
         [JsonProperty("messages_id")] 
-        public string? MessagesId { get; set; }
+        public List<string>? MessagesId { get; set; }
         
         [JsonProperty("created_at")] 
         public DateTime CreatedAt { get; set; }
