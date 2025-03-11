@@ -217,7 +217,7 @@ namespace MailerSendNetCore.UnitTests.Emails
                     suppressed_recipients = (object)null,
                     validation_errors_count = 0,
                     validation_errors = (object)null,
-                    messages_id = "['61487a14608b1d0b4d506633']",
+                    messages_id = new string[] { "61487a14608b1d0b4d506633" },
                     created_at = "2021-09-17T10:41:21.892000Z",
                     updated_at = "2021-09-17T10:41:23.684000Z"
                 }
@@ -238,7 +238,7 @@ namespace MailerSendNetCore.UnitTests.Emails
             response.Data.SuppressedRecipients.Should().Be(responseContent.data.suppressed_recipients);
             response.Data.ValidationErrorsCount.Should().Be(responseContent.data.validation_errors_count);
             response.Data.ValidationErrors.Should().Be(responseContent.data.validation_errors);
-            response.Data.MessagesId.Should().Be(responseContent.data.messages_id);
+            response.Data.MessagesId.Should().BeEquivalentTo(responseContent.data.messages_id);
             response.Data.CreatedAt.Should().BeSameDateAs(DateTime.Parse(responseContent.data.created_at));
             response.Data.UpdatedAt.Should().BeSameDateAs(DateTime.Parse(responseContent.data.updated_at));
         }
