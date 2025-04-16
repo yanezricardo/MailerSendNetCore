@@ -90,4 +90,4 @@ public async Task<string> SendEmail(string templateId, string senderName, string
 ## Additional Resources
 * [MailerSend developer site](https://developers.mailersend.com)
 * [Newtonsoft.Json documentation](https://www.newtonsoft.com/json/help/html/introduction.htm)
-* [.NET 7 documentation](https://learn.microsoft.com/en-us/dotnet/)
+* [.NET documentation](https://learn.microsoft.com/en-us/dotnet/)
