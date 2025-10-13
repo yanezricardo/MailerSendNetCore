@@ -1,19 +1,18 @@
 ﻿using Newtonsoft.Json;
 
-namespace MailerSendNetCore.Emails.Dtos
+namespace MailerSendNetCore.Emails.Dtos;
+
+public class MailerSendEmailRecipient
 {
-    public class MailerSendEmailRecipient
+    [JsonProperty("email")]
+    public string Email { get; set; }
+
+    [JsonProperty("name")]
+    public string Name { get; set; }
+
+    public MailerSendEmailRecipient(string email, string name)
     {
-        [JsonProperty("email")]
-        public string Email { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        public MailerSendEmailRecipient(string email, string name)
-        {
-            Email = email;
-            Name = name;
-        }
+        Email = email;
+        Name = name;
     }
 }

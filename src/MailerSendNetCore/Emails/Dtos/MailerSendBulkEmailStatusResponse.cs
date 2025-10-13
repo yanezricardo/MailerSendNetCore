@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace MailerSendNetCore.Emails.Dtos
+namespace MailerSendNetCore.Emails.Dtos;
+
+public class MailerSendBulkEmailStatusResponse
 {
-    public class MailerSendBulkEmailStatusResponse
-    {
-        [JsonProperty("data")]
-        public MailerSendBulkEmailStatusData? Data { get; set; }
-    }
+    [JsonProperty("data")]
+    public MailerSendBulkEmailStatusData? Data { get; set; }
 }

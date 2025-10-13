@@ -1,13 +1,12 @@
-﻿namespace MailerSendNetCore.Common
+﻿namespace MailerSendNetCore.Common;
+
+internal struct ObjectResponseResult<T>
 {
-    internal struct ObjectResponseResult<T>
+    public ObjectResponseResult(T responseObject, string responseText)
     {
-        public ObjectResponseResult(T responseObject, string responseText)
-        {
-            this.Object = responseObject;
-            this.Text = responseText;
-        }
-        public T Object { get; }
-        public string Text { get; }
+        this.Object = responseObject;
+        this.Text = responseText;
     }
+    public T Object { get; }
+    public string Text { get; }
 }

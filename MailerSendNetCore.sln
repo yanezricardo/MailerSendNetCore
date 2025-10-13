@@ -13,6 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailerSendNetCore", "src\Ma
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02C7CE20-E9B7-44D5-A2F3-ABA3B0E4F53F}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.github\workflows\build_and_tests.yml = .github\workflows\build_and_tests.yml
 		.github\dependabot.yml = .github\dependabot.yml
 		README.md = README.md

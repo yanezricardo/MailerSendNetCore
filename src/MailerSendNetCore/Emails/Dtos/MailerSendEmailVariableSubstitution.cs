@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
 
-namespace MailerSendNetCore.Emails.Dtos
-{
-    public class MailerSendEmailVariableSubstitution
-    {
-        [JsonProperty("var")]
-        public string? Var { get; set; }
+namespace MailerSendNetCore.Emails.Dtos;
 
-        [JsonProperty("value")]
-        public string? Value { get; set; }
-    }
+public class MailerSendEmailVariableSubstitution
+{
+    [JsonProperty("var")]
+    public string? Var { get; set; }
+
+    [JsonProperty("value")]
+    public string? Value { get; set; }
 }

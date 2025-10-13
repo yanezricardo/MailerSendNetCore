@@ -1,6 +1,6 @@
 ## MailerSend SDK for .NET
 
-This project provides an easy way to interact with the MailerSend API using C# and the .NET Framework. It is built on .NET 7 and uses Newtonsoft.Json for JSON serialization and deserialization.
+This project provides an easy way to interact with the MailerSend API using C# and .NET. It targets .NET 9 (net9.0) and uses Newtonsoft.Json for JSON serialization and deserialization.
 
 **This is an unofficial SDK for MailerSend and does not claim to be complete.**
 
@@ -21,7 +21,8 @@ Install-Package MailerSendNetCore
     "ApiUrl": "https://api.mailersend.com/v1",
     "ApiToken": "<your MailerSend api token>",
     "UseRetryPolicy": true,
-    "RetryCount": 5
+    "RetryCount": 5,
+    "RetryDelayInMilliseconds": 5000
   },
  ```
 
@@ -56,7 +57,7 @@ public EmailService(IMailerSendEmailClient mailerSendEmailClient)
 }
 ```
 
-#### Send emailS
+#### Send Emails
 
 ```C#
 public async Task<string> SendEmail(string templateId, string senderName, string senderEmail, string[] to, string subject, MailerSendEmailAttachment[] attachments, IDictionary<string, string>? variables, CancellationToken cancellationToken = default)
