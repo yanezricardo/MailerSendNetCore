@@ -19,7 +19,7 @@ public class MailerSendEmailParameters
     public ICollection<MailerSendEmailRecipient> Bcc { get; set; }
 
     [JsonProperty("reply_to", NullValueHandling = NullValueHandling.Ignore)]
-    public ICollection<MailerSendEmailRecipient> ReplyTo { get; set; }
+    public MailerSendEmailRecipient? ReplyTo { get; set; }
 
     [JsonProperty("subject")]
     public string? Subject { get; set; }
@@ -53,7 +53,7 @@ public class MailerSendEmailParameters
         To = new List<MailerSendEmailRecipient>();
         Bcc = new List<MailerSendEmailRecipient>();
         Cc = new List<MailerSendEmailRecipient>();
-        ReplyTo = new List<MailerSendEmailRecipient>();
+        ReplyTo = null;
         Variables = new List<MailerSendEmailVariable>();
         Attachments = new List<MailerSendEmailAttachment>();
         Personalizations = new List<MailerSendEmailPersonalization>();
@@ -150,6 +150,18 @@ public class MailerSendEmailParameters
             return this;
 
         Cc = new List<MailerSendEmailRecipient>(cc);
+        return this;
+    }
+
+    public MailerSendEmailParameters WithReplyTo(string email, string name = "")
+    {
+        ReplyTo = new MailerSendEmailRecipient(email, name);
+        return this;
+    }
+
+    public MailerSendEmailParameters WithReplyTo(MailerSendEmailRecipient replyTo)
+    {
+        ReplyTo = replyTo;
         return this;
     }
 
