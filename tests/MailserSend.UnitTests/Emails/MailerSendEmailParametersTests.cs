@@ -12,7 +12,7 @@ public class MailerSendEmailParametersTests
     {
         var instance = new MailerSendEmailParameters();
         Assert.NotNull(instance.To);
-        Assert.NotNull(instance.ReplyTo);
+        Assert.Null(instance.ReplyTo);
         Assert.NotNull(instance.Variables);
         Assert.NotNull(instance.Attachments);
         Assert.NotNull(instance.Personalizations);
@@ -104,6 +104,26 @@ public class MailerSendEmailParametersTests
         Assert.NotNull(instance.From);
         Assert.Equal("test@test.com", instance.From.Email);
         Assert.Equal("Test", instance.From.Name);
+    }
+
+    [Fact]
+    public void Test_WithReplyTo1_ShouldSetReplyToObject()
+    {
+        var instance = new MailerSendEmailParameters();
+        instance.WithReplyTo(new MailerSendEmailRecipient("reply@test.com", "Reply"));
+        Assert.NotNull(instance.ReplyTo);
+        Assert.Equal("reply@test.com", instance.ReplyTo.Email);
+        Assert.Equal("Reply", instance.ReplyTo.Name);
+    }
+
+    [Fact]
+    public void Test_WithReplyTo2_ShouldSetReplyToObject()
+    {
+        var instance = new MailerSendEmailParameters();
+        instance.WithReplyTo("reply@test.com", "Reply");
+        Assert.NotNull(instance.ReplyTo);
+        Assert.Equal("reply@test.com", instance.ReplyTo.Email);
+        Assert.Equal("Reply", instance.ReplyTo.Name);
     }
 
     [Fact]
