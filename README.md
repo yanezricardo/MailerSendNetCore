@@ -1,6 +1,6 @@
 ## MailerSend SDK for .NET
 
-This project provides an easy way to interact with the MailerSend API using C# and .NET. It targets .NET 9 (net9.0) and uses Newtonsoft.Json for JSON serialization and deserialization.
+This project provides an easy way to interact with the MailerSend API using C# and .NET. It targets .NET 10 (net10.0) and uses Newtonsoft.Json for JSON serialization and deserialization.
 
 **This is an unofficial SDK for MailerSend and does not claim to be complete.**
 

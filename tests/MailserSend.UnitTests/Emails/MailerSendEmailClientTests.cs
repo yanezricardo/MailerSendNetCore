@@ -35,7 +35,7 @@ public class MailerSendEmailClientTests
         var parameters = new MailerSendEmailParameters();
         parameters.WithTo("test@test.com").WithSubject("Hi!").WithHtmlBody("this is a test");
 
-        var response = await client.SendEmailAsync(parameters);
+        var response = await client.SendEmailAsync(parameters, TestContext.Current.CancellationToken);
         Assert.NotNull(response);
         Assert.Equal("msg-422", response.MessageId);
         Assert.Equal("Validation failed.", response.Message);
@@ -48,7 +48,7 @@ public class MailerSendEmailClientTests
         var handler = new MockHttpMessageHandler(HttpStatusCode.Accepted, responseContent: null);
         IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
-        Task Act() => client.SendEmailAsync((MailerSendEmailParameters)null);
+        Task Act() => client.SendEmailAsync((MailerSendEmailParameters)null, TestContext.Current.CancellationToken);
         await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
@@ -59,7 +59,7 @@ public class MailerSendEmailClientTests
         var handler = new MockHttpMessageHandler(HttpStatusCode.Accepted, responseContent: null);
         IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
-        Task Act() => client.SendBulkEmailAsync((MailerSendEmailParameters[])null);
+        Task Act() => client.SendBulkEmailAsync((MailerSendEmailParameters[])null, TestContext.Current.CancellationToken);
         await Assert.ThrowsAsync<ArgumentNullException>(Act);
     }
 
@@ -73,7 +73,7 @@ public class MailerSendEmailClientTests
         IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
         var bulkEmailId = "bulk_id";
-        var ex = await Assert.ThrowsAsync<ApiException>(async () => await client.GetBulkEmailStatusAsync(bulkEmailId));
+        var ex = await Assert.ThrowsAsync<ApiException>(async () => await client.GetBulkEmailStatusAsync(bulkEmailId, TestContext.Current.CancellationToken));
         Assert.Equal((int)HttpStatusCode.ServiceUnavailable, ex.StatusCode);
         Assert.Contains("service unavailable", ex.Response);
         Assert.NotNull(ex.Headers);
@@ -92,7 +92,7 @@ public class MailerSendEmailClientTests
             .WithSubject("Hi!")
             .WithHtmlBody("this is a test");
 
-        Func<Task> action = async () => { await client.SendEmailAsync(parameters); };
+        Func<Task> action = async () => { await client.SendEmailAsync(parameters, TestContext.Current.CancellationToken); };
         var ex = await Assert.ThrowsAsync<ApiException>(action);
         Assert.Equal("Unexpected response HTTP status code (500).\n\nStatus: 500\nResponse: \n", ex.Message);
     }
@@ -110,7 +110,7 @@ public class MailerSendEmailClientTests
             .WithSubject("Hi!")
             .WithHtmlBody("this is a test");
 
-        Func<Task> action = async () => { await client.SendEmailAsync(parameters); };
+        Func<Task> action = async () => { await client.SendEmailAsync(parameters, TestContext.Current.CancellationToken); };
         var ex = await Assert.ThrowsAsync<ApiException>(action);
         Assert.Equal("Unexpected response.\n\nStatus: 422\nResponse: \n", ex.Message);
     }
@@ -139,7 +139,7 @@ public class MailerSendEmailClientTests
             .WithSubject("Hi!")
             .WithHtmlBody("this is a test");
 
-        var response = await client.SendEmailAsync(parameters);
+        var response = await client.SendEmailAsync(parameters, TestContext.Current.CancellationToken);
         Assert.NotNull(response);
         Assert.Equal("The given data was invalid.", response.Message);
         Assert.NotNull(response.Errors);
@@ -168,7 +168,7 @@ public class MailerSendEmailClientTests
             .WithSubject("Hi!")
             .WithHtmlBody("this is a test");
 
-        var response = await client.SendEmailAsync(parameters);
+        var response = await client.SendEmailAsync(parameters, TestContext.Current.CancellationToken);
         Assert.NotNull(response);
         Assert.Equal("messageid", response.MessageId);
         Assert.True(string.IsNullOrEmpty(response.Message));
@@ -202,7 +202,7 @@ public class MailerSendEmailClientTests
 
         Func<Task> action = async () =>
         {
-            await client.SendBulkEmailAsync(bulkParameters.ToArray());
+            await client.SendBulkEmailAsync(bulkParameters.ToArray(), TestContext.Current.CancellationToken);
         };
 
         var ex = await Assert.ThrowsAsync<ApiException>(action);
@@ -241,7 +241,7 @@ public class MailerSendEmailClientTests
             .WithSubject("Hi!")
             .WithHtmlBody("this is a test");
 
-        var response = await client.SendBulkEmailAsync(bulkParameters.ToArray());
+        var response = await client.SendBulkEmailAsync(bulkParameters.ToArray(), TestContext.Current.CancellationToken);
         Assert.NotNull(response);
         Assert.Equal(responseContent.bulk_email_id, response.BulkEmailId);
         Assert.Equal(responseContent.message, response.Message);
@@ -256,7 +256,7 @@ public class MailerSendEmailClientTests
         IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
         var bulkEmailId = "bulk_id";
-        Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId); };
+        Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId, TestContext.Current.CancellationToken); };
         var ex = await Assert.ThrowsAsync<ApiException>(action);
         Assert.Equal("Unexpected response HTTP status code (500).\n\nStatus: 500\nResponse: \n", ex.Message);
     }
@@ -288,7 +288,7 @@ public class MailerSendEmailClientTests
         IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
         var bulkEmailId = "bulk_id";
-        var response = await client.GetBulkEmailStatusAsync(bulkEmailId);
+        var response = await client.GetBulkEmailStatusAsync(bulkEmailId, TestContext.Current.CancellationToken);
         Assert.NotNull(response);
         Assert.Equal(responseContent.data.id, response.Data.Id);
         Assert.Equal(responseContent.data.state, response.Data.State);
@@ -312,7 +312,7 @@ public class MailerSendEmailClientTests
 
         var bulkEmailId = "bulk_id";
 
-        Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId); };
+        Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId, TestContext.Current.CancellationToken); };
         var exNotFound = await Assert.ThrowsAsync<ApiException>(action);
         Assert.Equal("Not Found (bulk_id)\n\nStatus: 404\nResponse: \n", exNotFound.Message);
     }
@@ -327,7 +327,7 @@ public class MailerSendEmailClientTests
         IMailerSendEmailClient client = new MailerSendEmailClient(new MockHttpClient(handler), Options.Create(new MailerSendEmailClientOptions { ApiToken = apiToken }));
 
         var bulkEmailId = "bulk_id";
-        Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId); };
+        Func<Task> action = async () => { await client.GetBulkEmailStatusAsync(bulkEmailId, TestContext.Current.CancellationToken); };
         var exTooMany = await Assert.ThrowsAsync<ApiException>(action);
         Assert.Equal("Unexpected response HTTP status code (429).\n\nStatus: 429\nResponse: \n", exTooMany.Message);
     }
@@ -347,7 +347,7 @@ public class MailerSendEmailClientTests
             .WithSubject("Hi!")
             .WithHtmlBody("this is a test");
 
-        var response = await client.SendEmailAsync(parameters);
+        var response = await client.SendEmailAsync(parameters, TestContext.Current.CancellationToken);
 
         // Assert that the request content does not contain SendTime
         var requestContent = handler.GetLastRequestContent<MailerSendEmailParameters>();
