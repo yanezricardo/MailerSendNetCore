@@ -152,6 +152,19 @@ public class MailerSendEmailParametersTests
     }
 
     [Fact]
+    public void Test_WithAttachment9_WhitespaceDisposition_ShouldBeTreatedAsNotProvided()
+    {
+        var instance = new MailerSendEmailParameters();
+        instance.WithAttachment("1", "file.pdf", "<base64content>", "   ");
+
+        var attachment = instance.Attachments.Single();
+        Assert.Null(attachment.Disposition);
+
+        var json = JsonConvert.SerializeObject(instance);
+        Assert.DoesNotContain("\"disposition\":", json);
+    }
+
+    [Fact]
     public void Test_WithFrom1_ShouldSetFromObject()
     {
         var instance = new MailerSendEmailParameters();

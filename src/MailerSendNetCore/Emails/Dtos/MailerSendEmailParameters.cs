@@ -286,7 +286,10 @@ public class MailerSendEmailParameters
             throw new ArgumentNullException(nameof(attachment));
 
         if (string.IsNullOrWhiteSpace(attachment.Disposition))
+        {
+            attachment.Disposition = null;
             return;
+        }
 
         var disposition = attachment.Disposition.Trim().ToLowerInvariant();
         if (disposition != "inline" && disposition != "attachment")
