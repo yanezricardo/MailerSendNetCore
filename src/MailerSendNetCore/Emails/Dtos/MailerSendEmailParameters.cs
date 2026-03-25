@@ -192,7 +192,17 @@ public class MailerSendEmailParameters
 
     public MailerSendEmailParameters WithAttachment(string id, string filename, string content)
     {
-        Attachments.Add(new MailerSendEmailAttachment(id, filename, content));
+        var attachment = new MailerSendEmailAttachment(id, filename, content);
+        ValidateAndNormalizeAttachment(attachment);
+        Attachments.Add(attachment);
+        return this;
+    }
+
+    public MailerSendEmailParameters WithAttachment(string id, string filename, string content, string disposition)
+    {
+        var attachment = new MailerSendEmailAttachment(id, filename, content, disposition);
+        ValidateAndNormalizeAttachment(attachment);
+        Attachments.Add(attachment);
         return this;
     }
 
@@ -200,6 +210,11 @@ public class MailerSendEmailParameters
     {
         if (attachments == null)
             return this;
+
+        foreach (var attachment in attachments)
+        {
+            ValidateAndNormalizeAttachment(attachment);
+        }
 
         Attachments = new List<MailerSendEmailAttachment>(attachments);
         return this;
@@ -263,5 +278,26 @@ public class MailerSendEmailParameters
 
         // Replace HTML entities.
         return WebUtility.HtmlDecode(plainText);
+    }
+
+    private static void ValidateAndNormalizeAttachment(MailerSendEmailAttachment attachment)
+    {
+        if (attachment == null)
+            throw new ArgumentNullException(nameof(attachment));
+
+        if (string.IsNullOrWhiteSpace(attachment.Disposition))
+        {
+            attachment.Disposition = null;
+            return;
+        }
+
+        var disposition = attachment.Disposition.Trim().ToLowerInvariant();
+        if (disposition != "inline" && disposition != "attachment")
+            throw new InvalidOperationException("Attachment disposition must be either 'inline' or 'attachment'.");
+
+        if (disposition == "inline" && string.IsNullOrWhiteSpace(attachment.Id))
+            throw new InvalidOperationException("Attachment disposition 'inline' requires a non-empty id for cid usage.");
+
+        attachment.Disposition = disposition;
     }
 }
