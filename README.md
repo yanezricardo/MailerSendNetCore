@@ -88,6 +88,24 @@ public async Task<string> SendEmail(string templateId, string senderName, string
 }
 ```
 
+#### Attachment disposition (`inline` / `attachment`)
+
+`MailerSendEmailAttachment` supports an optional `Disposition` value:
+- `inline` for CID-based content (for example embedded images),
+- `attachment` for regular file attachments.
+
+When using `inline`, provide a non-empty `Id` so it can be referenced from HTML using `cid:<id>`.
+
+```C#
+var parameters = new MailerSendEmailParameters()
+    .WithFrom("sender@example.com", "Sender")
+    .WithTo("recipient@example.com")
+    .WithSubject("Inline image example")
+    .WithHtmlBody("<p>Logo:</p><img src=\"cid:logo-company\" />")
+    .WithAttachment("logo-company", "logo.png", "<base64content>", "inline")
+    .WithAttachment("doc-1", "file.pdf", "<base64content>", "attachment");
+```
+
 ## Additional Resources
 * [MailerSend developer site](https://developers.mailersend.com)
 * [Newtonsoft.Json documentation](https://www.newtonsoft.com/json/help/html/introduction.htm)

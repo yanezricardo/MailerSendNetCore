@@ -1,4 +1,5 @@
 using MailerSendNetCore.Emails.Dtos;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using Xunit;
@@ -84,6 +85,70 @@ public class MailerSendEmailParametersTests
         Assert.Equal("2", attachment.Id);
         Assert.Equal("file2.pdf", attachment.FileName);
         Assert.Equal("<base64content>", attachment.Content);
+    }
+
+    [Fact]
+    public void Test_WithAttachment3_ShouldSetDispositionAndNormalizeToLowercase()
+    {
+        var instance = new MailerSendEmailParameters();
+        instance.WithAttachment("logo", "logo.png", "<base64content>", "INLINE");
+
+        var attachment = instance.Attachments.Single();
+        Assert.Equal("inline", attachment.Disposition);
+    }
+
+    [Fact]
+    public void Test_WithAttachment4_ShouldRejectInvalidDisposition()
+    {
+        var instance = new MailerSendEmailParameters();
+
+        Action action = () => instance.WithAttachment("1", "file.pdf", "<base64content>", "file");
+        var ex = Assert.Throws<InvalidOperationException>(action);
+        Assert.Equal("Attachment disposition must be either 'inline' or 'attachment'.", ex.Message);
+    }
+
+    [Fact]
+    public void Test_WithAttachment5_ShouldRequireIdForInlineDisposition()
+    {
+        var instance = new MailerSendEmailParameters();
+
+        Action action = () => instance.WithAttachment(" ", "file.pdf", "<base64content>", "inline");
+        var ex = Assert.Throws<InvalidOperationException>(action);
+        Assert.Equal("Attachment disposition 'inline' requires a non-empty id for cid usage.", ex.Message);
+    }
+
+    [Fact]
+    public void Test_WithAttachment6_ShouldValidateDispositionInCollectionOverload()
+    {
+        var instance = new MailerSendEmailParameters();
+
+        Action action = () => instance.WithAttachment(new MailerSendEmailAttachment("1", "file.pdf", "<base64content>", "invalid"));
+        var ex = Assert.Throws<InvalidOperationException>(action);
+        Assert.Equal("Attachment disposition must be either 'inline' or 'attachment'.", ex.Message);
+    }
+
+    [Fact]
+    public void Test_WithAttachment7_ShouldRequireIdForInlineDispositionInCollectionOverload()
+    {
+        var instance = new MailerSendEmailParameters();
+
+        Action action = () => instance.WithAttachment(new MailerSendEmailAttachment("", "file.pdf", "<base64content>", "inline"));
+        var ex = Assert.Throws<InvalidOperationException>(action);
+        Assert.Equal("Attachment disposition 'inline' requires a non-empty id for cid usage.", ex.Message);
+    }
+
+    [Fact]
+    public void Test_WithAttachment8_ShouldSerializeDispositionOnlyWhenProvided()
+    {
+        var instanceWithDisposition = new MailerSendEmailParameters();
+        instanceWithDisposition.WithAttachment("logo", "logo.png", "<base64content>", "inline");
+        var withDispositionJson = JsonConvert.SerializeObject(instanceWithDisposition);
+        Assert.Contains("\"disposition\":\"inline\"", withDispositionJson);
+
+        var instanceWithoutDisposition = new MailerSendEmailParameters();
+        instanceWithoutDisposition.WithAttachment("1", "file.pdf", "<base64content>");
+        var withoutDispositionJson = JsonConvert.SerializeObject(instanceWithoutDisposition);
+        Assert.DoesNotContain("\"disposition\":", withoutDispositionJson);
     }
 
     [Fact]
