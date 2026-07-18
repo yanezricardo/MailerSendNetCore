@@ -23,6 +23,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{9F680455-BAEA-453A-9791-89D2427205AE}"
 	ProjectSection(SolutionItems) = preProject
 		docs\plan-mailersendnetcore-0.3.0.md = docs\plan-mailersendnetcore-0.3.0.md
+		docs\plan-mailersendnetcore-1.0.0.md = docs\plan-mailersendnetcore-1.0.0.md
 	EndProjectSection
 EndProject
 Global

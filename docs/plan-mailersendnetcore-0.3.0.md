@@ -1,11 +1,13 @@
 ---
 id: PLAN-MAILERSENDNETCORE-0-3-0
 title: MailerSendNetCore 0.3.0 compatibility modernization
-status: in_review
+status: completed
 owner: maintainer
 updated: 2026-07-18
 issue: 72
 pull_request: 73
+published_version: 0.3.0
+published_at: 2026-07-18
 ---
 
 # Plan — MailerSendNetCore 0.3.0
@@ -455,6 +457,21 @@ break from `0.2.0`, correct DI registration, compatible Polly 8 retries, correct
 suppression handling, green compatibility tests, and a validated `.nupkg`.
 
 Reintroducing the package into CreaHabitat remains a separate delivery.
+
+## Publication closeout
+
+Verified on 2026-07-18:
+
+- Pull Request [#73](https://github.com/yanezricardo/MailerSendNetCore/pull/73) merged with green CI.
+- Issue [#72](https://github.com/yanezricardo/MailerSendNetCore/issues/72) closed.
+- GitHub Release [`v0.3.0`](https://github.com/yanezricardo/MailerSendNetCore/releases/tag/v0.3.0)
+  points to merge commit `b96d8c3f81154d2099fab14189b0120bbc0c782f`.
+- NuGet.org serves `MailerSendNetCore 0.3.0`.
+- The published package is signed and contains the expected `net10.0` assembly, README, changelog,
+  license expression, repository metadata, and dependency graph.
+- `Microsoft.Extensions.Http.Polly` and `Polly.Extensions.Http` are absent from the published
+  dependency graph.
+- A fresh consumer restored exclusively from NuGet.org and compiled without warnings or errors.
 
 ## Future work (`1.0`)
 
