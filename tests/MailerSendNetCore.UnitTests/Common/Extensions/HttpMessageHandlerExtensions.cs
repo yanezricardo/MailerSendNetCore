@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 
-namespace MailserSend.UnitTests.Common.Extensions;
+namespace MailerSendNetCore.UnitTests.Common.Extensions;
 
 public static class HttpMessageHandlerExtensions
 {

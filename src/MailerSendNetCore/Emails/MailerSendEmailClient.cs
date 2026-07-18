@@ -43,18 +43,42 @@ public class MailerSendEmailClient : IMailerSendEmailClient
         var status = (int)response.StatusCode;
         if (status == 202)
         {
-            return new MailerSendEmailResponse { MessageId = xMesageId };
+            var objectResponse = await response.ReadObjectResponseAsync<MailerSendEmailApiResponse>(
+                headers,
+                _serializerSettings,
+                cancellationToken);
+
+            if (objectResponse.Object is null)
+            {
+                if (string.IsNullOrWhiteSpace(objectResponse.Text))
+                {
+                    return new MailerSendEmailResponse { MessageId = xMesageId };
+                }
+
+                throw new ApiException(
+                    "Unexpected response.",
+                    status,
+                    objectResponse.Text,
+                    headers,
+                    null);
+            }
+
+            return CreateEmailResponse(objectResponse.Object, xMesageId);
         }
 
         if (status == 422)
         {
-            var objectResponse = await response.ReadObjectResponseAsync<MailerSendEmailResponse>(headers, _serializerSettings!, cancellationToken: cancellationToken);
+            var objectResponse = await response.ReadObjectResponseAsync<MailerSendEmailApiResponse>(
+                headers,
+                _serializerSettings,
+                cancellationToken);
+
             if (objectResponse.Object == null)
             {
                 throw new ApiException("Unexpected response.", status, objectResponse.Text, headers, null);
             }
-            objectResponse.Object.MessageId = xMesageId;
-            return objectResponse.Object;
+
+            return CreateEmailResponse(objectResponse.Object, xMesageId);
         }
 
         var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -144,5 +168,24 @@ public class MailerSendEmailClient : IMailerSendEmailClient
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiToken);
 
         return await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static MailerSendEmailResponse CreateEmailResponse(
+        MailerSendEmailApiResponse apiResponse,
+        string? messageId)
+    {
+        var warnings = apiResponse.Warnings?
+            .Select(warning => warning.ToResponse())
+            .ToArray()
+            ?? Array.Empty<MailerSendEmailWarningResponse>();
+
+        return new MailerSendEmailResponse
+        {
+            MessageId = messageId,
+            Message = apiResponse.Message,
+            Errors = apiResponse.Errors,
+            Warnings = warnings.FirstOrDefault(),
+            WarningItems = warnings
+        };
     }
 }

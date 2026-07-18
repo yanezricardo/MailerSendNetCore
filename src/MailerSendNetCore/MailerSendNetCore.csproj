@@ -4,18 +4,22 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Version>0.2.0</Version>
+		<Version>0.3.0</Version>
 		<PackageId>MailerSendNetCore</PackageId>
 		<Authors>Ricardo Yánez</Authors>
-		<Product>MailerSendNetCoreNetCore</Product>
+		<Product>MailerSendNetCore</Product>
 		<Description>A simple client for MailerSend</Description>
 		<PackageTags>MailerSend</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReleaseNotes>This project is an unofficial client for MailerSend and does not claim to be complete, I just added the use cases that I needed for my uses.</PackageReleaseNotes>
+		<PackageReleaseNotes>Compatibility-focused modernization: removes deprecated HTTP Polly integration, fixes DI registration, parses MailerSend 202 warnings, and preserves the 0.2.0 public API.</PackageReleaseNotes>
 		<RepositoryUrl>https://github.com/yanezricardo/MailerSendNetCore.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 		<PackageProjectUrl>https://github.com/yanezricardo/MailerSendNetCore</PackageProjectUrl>
+		<EnablePackageValidation>true</EnablePackageValidation>
+		<PackageValidationBaselineVersion>0.2.0</PackageValidationBaselineVersion>
+		<RunPackageValidationDependsOn>AddBaselinePackageValidationReferences</RunPackageValidationDependsOn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,18 +27,36 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
+	  <None Include="..\..\CHANGELOG.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Build-only references required to inspect the published 0.2.0 baseline. -->
+		<PackageDownload Include="Microsoft.Extensions.Http.Polly" Version="[10.0.5]" />
+		<PackageDownload Include="Polly.Extensions.Http" Version="[3.0.0]" />
 	</ItemGroup>
  
 	
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.9" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="Polly" Version="8.7.0" />
+		<PackageReference Include="Polly" Version="8.6.6" />
 	</ItemGroup>
+
+	<Target Name="AddBaselinePackageValidationReferences">
+		<ItemGroup>
+			<PackageValidationReferencePath Update="net10.0">
+				<ReferencePath>
+					%(PackageValidationReferencePath.ReferencePath),$(NuGetPackageRoot)microsoft.extensions.http.polly/10.0.5/lib/netstandard2.0/Microsoft.Extensions.Http.Polly.dll,$(NuGetPackageRoot)polly.extensions.http/3.0.0/lib/netstandard2.0/Polly.Extensions.Http.dll
+				</ReferencePath>
+			</PackageValidationReferencePath>
+		</ItemGroup>
+	</Target>
 
 </Project>
