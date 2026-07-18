@@ -549,4 +549,3 @@ public class MailerSendEmailParametersTests
         Assert.Equal("The email must be in the list of recipients (to)", exVar2.Message);
     }
 }
-

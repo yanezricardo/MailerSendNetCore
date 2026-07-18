@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MailserSend.UnitTests.Common.Extensions;
+namespace MailerSendNetCore.UnitTests.Common.Extensions;
 
 public class HttpResponseMessageExtensionsTests
 {

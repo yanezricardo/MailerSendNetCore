@@ -20,11 +20,16 @@ Install-Package MailerSendNetCore
   "MailerSend": {
     "ApiUrl": "https://api.mailersend.com/v1",
     "ApiToken": "<your MailerSend api token>",
-    "UseRetryPolicy": true,
+    "UseRetryPolicy": false,
     "RetryCount": 5,
     "RetryDelayInMilliseconds": 5000
   },
  ```
+
+`UseRetryPolicy=false` is recommended unless your application explicitly accepts the retry
+trade-off. When retries are enabled, transient failures can retry `POST` requests. If MailerSend
+accepted the first request but the transport failed before the response reached the caller, a retry
+can duplicate email delivery.
 
 #### Configure the client using one of the following methods:
 
@@ -79,14 +84,48 @@ public async Task<string> SendEmail(string templateId, string senderName, string
     }
 
     var response = await _mailerSendEmailClient.SendEmailAsync(parameters, cancellationToken);
-    if (response is { Errors.Count: > 0 })
+    if (response.HasErrors)
     {
-        //handle errors                
+        // Handle the existing 422 validation response.
     }
 
     return response.MessageId;
 }
 ```
+
+#### Accepted responses and suppressions
+
+MailerSend can return `202 Accepted` with warning details:
+
+```C#
+var response = await _mailerSendEmailClient.SendEmailAsync(parameters, cancellationToken);
+
+if (response.IsSuppressed)
+{
+    // ALL_SUPPRESSED: no message was queued and MessageId is absent.
+}
+else if (response.WarningItems.Count > 0)
+{
+    // SOME_SUPPRESSED: inspect all warning details.
+}
+
+if (response.IsQueued)
+{
+    Console.WriteLine(response.MessageId);
+}
+```
+
+The legacy `Warnings` property remains available and contains the first warning.
+`WarningItems` contains the complete response collection. Validation failures continue to return a
+`MailerSendEmailResponse` with `Errors`, preserving the existing `422` behavior.
+
+#### Retry compatibility
+
+The existing Polly callback overloads remain available in `0.3.0` for compatibility. They are
+legacy compatibility API and are scheduled for redesign in `1.0`.
+
+Applications that enable retries should make their email workflow tolerant of duplicate delivery
+and inspect `ApiException.RetryAfter` and `ApiException.IsTransient` when handling failures.
 
 #### Attachment disposition (`inline` / `attachment`)
 
@@ -110,3 +149,12 @@ var parameters = new MailerSendEmailParameters()
 * [MailerSend developer site](https://developers.mailersend.com)
 * [Newtonsoft.Json documentation](https://www.newtonsoft.com/json/help/html/introduction.htm)
 * [.NET documentation](https://learn.microsoft.com/en-us/dotnet/)
+
+## Migrating from 0.2.0
+
+`0.3.0` is intended as a compatible upgrade. Existing registration overloads, interfaces, response
+properties, retry options, Polly callbacks, and `422` behavior are preserved.
+
+The package no longer brings `Microsoft.Extensions.Http.Polly` or `Polly.Extensions.Http` into the
+consumer dependency graph. Consumers that directly used those transitive packages must add their
+own explicit package references.
