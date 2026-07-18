@@ -1,10 +1,11 @@
 ---
 id: PLAN-MAILERSENDNETCORE-0-3-0
 title: MailerSendNetCore 0.3.0 compatibility modernization
-status: in_progress
+status: in_review
 owner: maintainer
 updated: 2026-07-18
 issue: 72
+pull_request: 73
 ---
 
 # Plan — MailerSendNetCore 0.3.0
@@ -315,7 +316,8 @@ Output: correct warnings and suppressions without replacing the public contract.
 - [x] Build and inspect the `.nupkg`.
 - [x] Run minimal and known-consumer compilation checks.
 - [x] Complete independent compatibility review.
-- [ ] Prepare the Pull Request for approval.
+- [x] Prepare Pull Request
+      [#73](https://github.com/yanezricardo/MailerSendNetCore/pull/73) for approval.
 
 Output: review-ready package candidate. Publication remains a separate human-approved action.
 
